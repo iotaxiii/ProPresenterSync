@@ -1,0 +1,18 @@
+{
+    "ws": {
+        "instance": {
+            "isClient": true,
+            "isMaster": true
+        },
+        "local": {
+            "host": "localhost",
+            "port": 40000,
+            "password": "please change"
+        },
+        "remote": {
+            "host": "server",
+            "post": 40000,
+            "certPath": "./public.cer"
+        }
+    }
+}

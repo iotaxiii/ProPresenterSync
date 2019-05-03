@@ -1,0 +1,34 @@
+{
+    "authenticate": {
+        "action": "authenticate",
+        "protocol": "600",
+        "password": "override this!"
+    },
+    "getLibrary": {
+        "action": "libraryRequest"
+    },
+    "getPlaylists": {
+        "action": "playlistRequestAll"
+    },
+    "getCurrentPresentation": {
+        "action": "presentationCurrent",
+        "presentationSlideQuality": 0
+    },
+    "getCurrentSlideIndex": {
+        "action": "presentationSlideIndex"
+    },
+    "requestCurrent": {
+        "action": "presentationCurrent",
+        "presentationSlideQuality": 25
+    },
+    "requestPresentation": {
+        "action": "presentationRequest",
+        "presentationPath": "",
+        "presentationSlideQuality": 0
+    },
+    "triggerSlide": {
+        "action": "presentationTriggerIndex",
+        "slideIndex": 3,
+        "presentationPath": ""
+    }
+}
