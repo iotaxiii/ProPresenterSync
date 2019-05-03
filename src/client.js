@@ -1,5 +1,8 @@
 let ws = new WebSocket('ws:localhost:8080');
 
+let state = 0; 
+const states = {"Resumed": 0, "Paused": 1}
+
 function connect() {
     console.log('connecting', ws.readyState);
     if (ws.readyState !== ws.OPEN) ws = new WebSocket('ws:localhost:8080');
@@ -34,7 +37,17 @@ function setMessage(message, stringify) {
     document.getElementById('output').innerText = message
 }
 
+function statusCheck() {
+    connect();
+}
+
+function setButtonStates() {
+    //TODO
+}
+
 document.getElementById('start').addEventListener('click', connect);
 document.getElementById('pause').addEventListener('click', pause);
 document.getElementById('resume').addEventListener('click', resume);
 document.getElementById('stop').addEventListener('click', stop);
+setInterval(statusCheck, 10000);
+
