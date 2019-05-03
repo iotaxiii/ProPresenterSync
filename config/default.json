@@ -10,7 +10,7 @@
         },
         "remote": {
             "host": "server",
-            "post": 40000,
+            "port": 40000,
             "certPath": "./public.cer"
         }
     },
