@@ -6,19 +6,20 @@
         "local": {
             "host": "localhost",
             "port": 40000,
-            "password": "please change"
+            "password": "please change!"
         },
         "remote": {
             "host": "server",
             "port": 40000,
-            "certPath": "./public.cer"
+            "certPath": "./keys/public.crt",
+            "keyPath": "./keys/public.key"
         }
     },
     "ppActions": {
         "authenticate": {
             "action": "authenticate",
             "protocol": "600",
-            "password": "override this!"
+            "password": "please change!"
         },
         "getLibrary": {
             "action": "libraryRequest"
