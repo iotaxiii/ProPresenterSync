@@ -19,8 +19,6 @@ function setSlide(path, index) {
 
 function onMessage(event) {
     const message = JSON.parse(event);
-    let text;
-
     switch(message.action) {
         case 'authenticate':
             text = message.error ? message.error : 'Authenticated';
@@ -42,10 +40,6 @@ function authLocal() {
     wsl.send(JSON.stringify(action));  
 }
 
-function authRemote() {
-    //TODO
-}
-
 module.exports = {
 
     init: (local, remote) => {
@@ -53,7 +47,6 @@ module.exports = {
         wsr = remote;
 
         authLocal();
-        authRemote();
 
         wsr.on('message', onMessage);
 

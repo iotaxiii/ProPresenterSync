@@ -10,7 +10,11 @@ function logMessage(event) {
 }
 
 function setSlide(path, index) {
-    if (propagateEvents) wsr.send({"presentationPath": path, slideIndex: index});
+    let action = Object.assign({}, actions.triggerSlide);
+    action.slideIndex = index;
+    action.presentationPath = path;
+    if (propagateEvents) 
+        wsr.send(JSON.stringify(action));
 }
 
 function authLocal() {
@@ -19,13 +23,8 @@ function authLocal() {
     wsl.send(JSON.stringify(action));  
 }
 
-function authRemote() {
-    //TODO
-}
-
 function onMessage(event) {
     const message = JSON.parse(event);
-    let text;
 
     switch(message.action) {
         case 'authenticate':
@@ -48,7 +47,6 @@ module.exports = {
         wsr = remote;
 
         authLocal();
-        authRemote();
 
         wsl.on('message', onMessage);
 

@@ -1,11 +1,22 @@
-let ws = new WebSocket('ws:localhost:8080');
+let ws = new WebSocket('ws:localhost:8081');
 
 let state = 0; 
 const states = {"Resumed": 0, "Paused": 1}
 
 function connect() {
     console.log('connecting', ws.readyState);
-    if (ws.readyState !== ws.OPEN) ws = new WebSocket('ws:localhost:8080');
+    if (ws.readyState !== ws.OPEN) {
+        ws = new WebSocket('ws:localhost:8081');
+        
+        ws.onopen = (event) => {
+            setMessage('Connecting...');
+        };
+        
+        ws.onmessage = (event) => {
+            console.log(event);
+            setMessage(event.data, true);
+        };
+    }
 };
 
 ws.onopen = (event) => {

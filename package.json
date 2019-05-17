@@ -4,7 +4,10 @@
   "description": "",
   "main": "src/ws.js",
   "scripts": {
-    "start": "node src/ws.js",
+    "start": "node src/ws.js master",
+    "start:master": "node src/ws.js master",
+    "start:slave": "node src/ws.js slave",
+    "start:server": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
