@@ -3,6 +3,7 @@ const ws = config.get('ws');
 const actions = config.get('ppActions');
 
 let wsl, wsr;
+let callback;
 let propagateEvents = true;
 let filter = [];
 
@@ -21,16 +22,31 @@ function setSlide(path, index) {
 function onMessage(event) {
     const message = JSON.parse(event);
     switch(message.action) {
-        case 'authenticate':
-            text = message.error ? message.error : 'Authenticated';
-            break;
         case 'presentationTriggerIndex':
             currentSlide = message.slideIndex;
             currentPresentationPath = message.presentationPath;
+            if (!!callback) callback(JSON.stringify(message));
             setSlide(currentPresentationPath, currentSlide);
             break;
         default:
             text = JSON.stringify(message);
+            break;
+    }
+}
+
+function onLocal(event) {
+    const message = JSON.parse(event);
+    switch(message.action) {
+        case 'authenticate':
+            logMessage(message.error ? message.error : 'Authenticated');
+            break;
+        case 'presentationTriggerIndex':
+            if (!!callback) callback(JSON.stringify(message));
+            break;
+        case 'playlistRequestAll':
+            if (!!callback) callback(JSON.stringify(message));
+            break;
+        default:
             break;
     }
 }
@@ -41,20 +57,29 @@ function authLocal() {
     wsl.send(JSON.stringify(action));  
 }
 
+function getCurrentPlaylist() {
+    let action = actions.getPlaylists;
+    wsl.send(JSON.stringify(action));
+}
+
 module.exports = {
 
-    init: (local, remote) => {
+    init: (local, remote, cb) => {
         wsl = local;
         wsr = remote;
+        callback = cb;
 
         authLocal();
 
         wsr.on('message', onMessage);
+        wsl.on('message', onLocal);
 
         wsl.on('error', logMessage);
         wsr.on('error', logMessage);
         wsl.on('close', logMessage);
         wsr.on('close', logMessage);
+
+        getCurrentPlaylist();
     },
 
     getCurrentPlaylist: () => {

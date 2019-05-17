@@ -30,7 +30,7 @@ function onMessage(event) {
 
     switch(message.action) {
         case 'authenticate':
-            text = message.error ? message.error : 'Authenticated';
+            logMessage(message.error ? message.error : 'Authenticated');
             break;
         case 'presentationTriggerIndex':
             currentSlide = message.slideIndex;
@@ -42,7 +42,7 @@ function onMessage(event) {
             if (!!callback) callback(JSON.stringify(message));
             break;
         default:
-            text = JSON.stringify(message);
+            logMessage(JSON.stringify(message));
             break;
     }
 }
