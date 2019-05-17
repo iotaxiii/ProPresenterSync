@@ -27,6 +27,8 @@ const agent = new https.Agent({
 const auth = remote.auth;
 
 function connectPP() {
+    disconnect();
+
     wsl = new WebSocket('ws://' + wsconfig.local.host + ':' + wsconfig.local.port + '/remote');
     wsr = new WebSocket(
         'wss://' + wsconfig.remote.host + ':' + wsconfig.remote.port, 
@@ -38,29 +40,38 @@ function connectPP() {
         }
     ); 
 
-    wsl.on('open', () => { pp.init(wsl, wsr); });
+    wsl.on('open', () => { pp.init(wsl, wsr, sendToClient); });
 }
 
 function disconnect() {
     pp.disconnect();
 }
 
+function modifyFilter(name, location, action) {
+    pp.modifyFilter(name, location, action);
+}
+
+function sendToClient(message) {
+    wss.clients.forEach(c => c.send(message));
+}
+
 function handleClientMessage(event, client) {
-    switch (event) {
+    let json = JSON.parse(event);
+    let action = json.action;
+    switch (action) {
         case 'pause':
             pp.disableEvents();
-            client.send('paused');
+            client.send(JSON.stringify('paused'));
             break;
         case 'resume':
             pp.resumeEvents();
-            client.send('resumed');
+            client.send(JSON.stringify('resumed'));
             break;
-        case 'getPlaylist':
-            let playlist = pp.getCurrentPlaylist();
-            client.send(JSON.stringify(playlist));
+        case 'filter':
+            modifyFilter(json.name, json.location, json.filter);
             break;
         default:
-            logMessage(event);
+            logMessage(json);
             break;
     }
 }
@@ -74,7 +85,7 @@ wss.on('connection', function (socket, req) {
     socket.on('close', disconnect);
     socket.on('error', logMessage);
     logMessage('web client connected', req.connection.remoteAddress);
-    socket.send('Connected as ' + (masterArg ? 'master!' : 'slave!'));
+    socket.send(JSON.stringify('Connected as ' + (masterArg ? 'master!' : 'slave!')));
     connectPP();
 });
 wss.on('error', logMessage);

@@ -4,6 +4,7 @@ const actions = config.get('ppActions');
 
 let wsl, wsr;
 let propagateEvents = true;
+let filter = [];
 
 function logMessage(event) {
     console.log(event);
@@ -13,7 +14,7 @@ function setSlide(path, index) {
     let action = Object.assign({}, actions.triggerSlide);
     action.slideIndex = index;
     action.presentationPath = path;
-    if (propagateEvents) 
+    if (propagateEvents && !filter.includes(path)) 
         wsl.send(JSON.stringify(action));
 }
 
@@ -70,7 +71,19 @@ module.exports = {
     },
 
     disconnect: () => {
-        wsl.close();
-        wsr.close();
+        if (wsl) wsl.close();
+        if (wsr) wsr.close();
+    },
+
+    modifyFilter: (name, location, action) => {
+        if (action === 'add') {
+            if (!filter.includes(location)) {
+                filter.push(location);
+            }
+        } else {
+            let index = filter.indexOf(location);
+            if (index >= 0)
+                filter.splice(index, 1);
+        }
     }
 }
