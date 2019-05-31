@@ -31,6 +31,9 @@ function onmesage(event) {
                 break;
             case 'presentationTriggerIndex':
                 currentPlaylist = Number.parseInt(json.presentationPath.split(':')[0]);
+                break;
+            case 'presentationCurrent':
+                currentPlaylist = Number.parseInt(json.presentationPath.split(':')[0]);
                 loadPlaylists()
                 break;
             case 'filters':

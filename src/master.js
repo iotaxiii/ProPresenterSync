@@ -34,19 +34,18 @@ function onMessage(event) {
         case 'authenticate':
             logMessage(message.error ? message.error : 'Authenticated');
             sendInitState();
-            getCurrentPlaylist();
             break;
         case 'presentationTriggerIndex':
             currentSlide = message.slideIndex;
             currentPresentationPath = message.presentationPath;
-            if (!!callback) {
-                callback(JSON.stringify(message));
-            }
             setSlide(currentPresentationPath, currentSlide);
             break;
         case 'presentationCurrent':
             slide = message.slideIndex ? message.slideIndex : message.presentation.presentationCurrentLocation;
             currentPresentationPath = message.presentationPath;
+            if (!!callback) {
+                callback(JSON.stringify(message));
+            }
             setSlide(currentPresentationPath, slide);
             break;
         case 'presentationSlideIndex':
@@ -76,12 +75,17 @@ function sendInitState() {
         callback(JSON.stringify({"action":"filters", "filter": filter}));
 
         callback(JSON.stringify('Connected as master!'));
+
+        getCurrentPlaylist();
     }
 }
 
 function getCurrentPlaylist() {
     let action = actions.getPlaylists;
     wsl.send(JSON.stringify(action));
+
+    let action2 = actions.getCurrentPresentation;
+    wsl.send(JSON.stringify(action2));
 }
 
 function toggleVideoCheck() {

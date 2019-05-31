@@ -6,6 +6,7 @@ let wsl, wsr;
 let callback;
 let propagateEvents = true;
 let filter = [];
+let watching = -1;
 
 function logMessage(event) {
     console.log(event);
@@ -42,11 +43,16 @@ function onLocal(event) {
             sendInitState();
             getCurrentPlaylist();
             break;
-        case 'presentationTriggerIndex':
-            if (!!callback) callback(JSON.stringify(message));
             break;
         case 'playlistRequestAll':
             if (!!callback) callback(JSON.stringify(message));
+            break;
+        case 'presentationCurrent':
+            slide = message.slideIndex ? message.slideIndex : message.presentation.presentationCurrentLocation;
+            currentPresentationPath = message.presentationPath;
+            if (!!callback) {
+                callback(JSON.stringify(message));
+            }
             break;
         default:
             break;
@@ -62,6 +68,9 @@ function authLocal() {
 function getCurrentPlaylist() {
     let action = actions.getPlaylists;
     wsl.send(JSON.stringify(action));
+
+    let action2 = actions.getCurrentPresentation;
+    wsl.send(JSON.stringify(action2));
 }
 
 function sendInitState() {
