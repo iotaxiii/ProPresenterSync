@@ -88,7 +88,6 @@ wss.on('connection', function (socket, req) {
     socket.on('close', disconnect);
     socket.on('error', logMessage);
     logMessage('web client connected', req.connection.remoteAddress);
-    socket.send(JSON.stringify('Connected as ' + (masterArg ? 'master!' : 'slave!')));
     connectPP();
 });
 wss.on('error', logMessage);

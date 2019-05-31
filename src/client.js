@@ -1,15 +1,15 @@
 const url = 'ws:localhost:8080';
 
-let ws = new WebSocket(url);
+let ws;// = new WebSocket(url);
 
 let state = 0; 
 const states = {"Resumed": 0, "Paused": 1};
 let playlists;
 let currentPlaylist;
+let filter = [];
 
 function connect() {
-    console.log('connecting', ws.readyState);
-    if (ws.readyState !== ws.OPEN) {
+    if (ws == undefined || ws.readyState !== ws.OPEN) {
         ws = new WebSocket(url);
         
         ws.onopen = onopen;
@@ -33,6 +33,9 @@ function onmesage(event) {
                 currentPlaylist = Number.parseInt(json.presentationPath.split(':')[0]);
                 loadPlaylists()
                 break;
+            case 'filters':
+                filter = json.filter;
+                break;
             default:
                 setMessage(json, true);
         }
@@ -41,9 +44,6 @@ function onmesage(event) {
         setMessage(event.data, true);
     }
 }
-
-ws.onopen = onopen;
-ws.onmessage = onmessage;
 
 function pause() {
     setMessage('pausing', true);
@@ -94,6 +94,7 @@ function setButtonStates(message) {
         case '"disconnecting"':
             document.getElementById('stop').style.display = 'none';
             document.getElementById('start').style.display = '';
+            cleanPlaylists();
             break;
         case '"Connected as master!"':
         case '"Connected as slave!"':
@@ -106,20 +107,35 @@ function setButtonStates(message) {
     }
 }
 
+function cleanPlaylists() {
+    playlists = undefined;
+    currentPlaylist = undefined;
+    document.getElementById('currentPlaylist').innerHTML = '';
+}
+
 function loadPlaylists() {
     if (playlists == undefined || currentPlaylist == undefined)
+        return;
+    
+    let playlistDiv = document.getElementById('currentPlaylist');
+    if (playlistDiv.innerHTML != '') 
         return;
 
     let playlist = playlists[currentPlaylist];
     let sections = playlist.playlist;
     let names = sections.map(s => [s.playlistItemName, s.playlistItemLocation, s.playlistItemType]);
-    let playlistDiv = document.getElementById('currentPlaylist');
     let filtered = names.filter(n => n[2] != 'playlistItemTypeHeader')
-    let checkboxes = filtered.map(n => '<div class="input-group"><div class="input-group-prepend w-100"><div class="input-group-text w-100"><input type="checkbox" name="' + n[0] + '" location="' + n[1] + '" checked>' + n[0] + '</input></div></div></div>');
-    checkboxes.unshift('');
-    checkboxes.push('');
+    const divs = '<div class="input-group"><div class="input-group-prepend w-100"><div class="input-group-text w-100">';
+    const endDivs = '</div></div></div>';
+    let checkboxes = filtered.map(n => divs + 
+        '<input type="checkbox" ' + 
+        (filter.includes(n[1]) ? '' : 'checked') + 
+        ' name="' + n[0] + 
+        '" location="' + n[1] + 
+        '">' + n[0] + 
+        '</input>' + endDivs
+    );
     playlistDiv.innerHTML = checkboxes.join('');
-    
 }
 
 function changePlaylistActiveState(e) {
@@ -134,3 +150,4 @@ document.getElementById('stop').addEventListener('click', stop);
 document.getElementById('watch').addEventListener('click', watch);
 document.getElementById('currentPlaylist').addEventListener('change', changePlaylistActiveState);
 setInterval(statusCheck, 10000);
+connect();

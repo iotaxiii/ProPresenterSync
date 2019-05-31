@@ -39,6 +39,8 @@ function onLocal(event) {
     switch(message.action) {
         case 'authenticate':
             logMessage(message.error ? message.error : 'Authenticated');
+            sendInitState();
+            getCurrentPlaylist();
             break;
         case 'presentationTriggerIndex':
             if (!!callback) callback(JSON.stringify(message));
@@ -62,6 +64,20 @@ function getCurrentPlaylist() {
     wsl.send(JSON.stringify(action));
 }
 
+function sendInitState() {
+    if (!!callback) {
+        let pauseMessage = propagateEvents ? 'resumed' : 'paused';
+        callback(JSON.stringify(pauseMessage));
+
+        let watchMessage = watching == -1 ? 'stopped watching' : 'watching...';
+        callback(JSON.stringify(watchMessage));
+
+        callback(JSON.stringify({"action":"filters", "filter": filter}));
+
+        callback(JSON.stringify('Connected as slave!'));
+    }
+}
+
 module.exports = {
 
     init: (local, remote, cb) => {
@@ -78,8 +94,6 @@ module.exports = {
         wsr.on('error', logMessage);
         wsl.on('close', logMessage);
         wsr.on('close', logMessage);
-
-        getCurrentPlaylist();
     },
 
     getCurrentPlaylist: () => {

@@ -33,6 +33,8 @@ function onMessage(event) {
     switch(message.action) {
         case 'authenticate':
             logMessage(message.error ? message.error : 'Authenticated');
+            sendInitState();
+            getCurrentPlaylist();
             break;
         case 'presentationTriggerIndex':
             currentSlide = message.slideIndex;
@@ -60,6 +62,20 @@ function onMessage(event) {
         default:
             logMessage(JSON.stringify(message));
             break;
+    }
+}
+
+function sendInitState() {
+    if (!!callback) {
+        let pauseMessage = propagateEvents ? 'resumed' : 'paused';
+        callback(JSON.stringify(pauseMessage));
+
+        let watchMessage = watching == -1 ? 'stopped watching' : 'watching...';
+        callback(JSON.stringify(watchMessage));
+
+        callback(JSON.stringify({"action":"filters", "filter": filter}));
+
+        callback(JSON.stringify('Connected as master!'));
     }
 }
 
@@ -102,7 +118,6 @@ module.exports = {
         wsr.on('close', logMessage);
         
         callback = cb;
-        getCurrentPlaylist();
     },
 
     disableEvents: () => {
