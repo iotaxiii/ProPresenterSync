@@ -1,13 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
 </head>
 <h1>ProPresenter Controller</h1>
 
-<button id="start">Start</buton>
-<button id="pause">Pause</buton>
-<button id="resume">Resume</button>
-<button id="stop">Stop</button>
+<button id="start" class="btn btn-success">Start</buton>
+<button id="pause" class="btn btn-secondary">Pause</buton>
+<button id="resume" class="btn btn-secondary">Resume</button>
+<button id="stop" class="btn btn-danger">Stop</button>
+<button id="watch" class="btn btn-info">Watch</button>
 
 <p></p>
 
@@ -19,6 +21,7 @@
 <p></p>
 
 <h4>System Messages</h4>
-<div id="output"></div>
+<div id="output" class="alert alert-secondary"></div>
 
 <script type="text/javascript" src="./client.js"></script>
+</html>

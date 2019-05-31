@@ -6,6 +6,8 @@ let wsl, wsr;
 let callback;
 let propagateEvents = true;
 let filter = [];
+let currentSlide = '';
+let watching = -1;
 
 function logMessage(event) {
     console.log(event);
@@ -27,7 +29,7 @@ function authLocal() {
 
 function onMessage(event) {
     const message = JSON.parse(event);
-
+    let currentPresentationPath, slide;
     switch(message.action) {
         case 'authenticate':
             logMessage(message.error ? message.error : 'Authenticated');
@@ -35,8 +37,22 @@ function onMessage(event) {
         case 'presentationTriggerIndex':
             currentSlide = message.slideIndex;
             currentPresentationPath = message.presentationPath;
-            if (!!callback) callback(JSON.stringify(message));
+            if (!!callback) {
+                callback(JSON.stringify(message));
+            }
             setSlide(currentPresentationPath, currentSlide);
+            break;
+        case 'presentationCurrent':
+            slide = message.slideIndex ? message.slideIndex : message.presentation.presentationCurrentLocation;
+            currentPresentationPath = message.presentationPath;
+            setSlide(currentPresentationPath, slide);
+            break;
+        case 'presentationSlideIndex':
+            slide = message.slideIndex;
+            if (slide === -1 && currentSlide != slide) {
+                currentSlide = slide;
+                getVideoPath();
+            }
             break;
         case 'playlistRequestAll':
             if (!!callback) callback(JSON.stringify(message));
@@ -50,6 +66,25 @@ function onMessage(event) {
 function getCurrentPlaylist() {
     let action = actions.getPlaylists;
     wsl.send(JSON.stringify(action));
+}
+
+function toggleVideoCheck() {
+    if (watching == -1) {
+        watching = setInterval(checkForVideo, 50);  //this is kludgy - check for a different index to see if it's a video.  if it is, get it's path and send it on to the slaves
+        if (!!callback) callback(JSON.stringify('watching...'));
+    } else {
+        clearInterval(watching);
+        watching = -1;
+        if (!!callback) callback(JSON.stringify('stopped watching'));
+    }
+}
+
+function getVideoPath() {
+    wsl.send(JSON.stringify(actions.getCurrentPresentation));
+}
+
+function checkForVideo() {
+    wsl.send(JSON.stringify(actions.getCurrentSlideIndex));
 }
 
 module.exports = {
@@ -93,5 +128,9 @@ module.exports = {
             if (index >= 0)
                 filter.splice(index, 1);
         }
+    },
+
+    watch: () => {
+        toggleVideoCheck();
     }
 }

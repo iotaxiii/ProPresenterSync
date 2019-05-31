@@ -110,5 +110,9 @@ module.exports = {
             if (index >= 0)
                 filter.splice(index, 1);
         }
+    },
+
+    watch: () => {
+        if (!!callback) callback(JSON.stringify('slaves do not trigger videos'));
     }
 }

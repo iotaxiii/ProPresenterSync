@@ -70,6 +70,9 @@ function handleClientMessage(event, client) {
         case 'filter':
             modifyFilter(json.name, json.location, json.filter);
             break;
+        case 'watch':
+            pp.watch();
+            break;
         default:
             logMessage(json);
             break;
