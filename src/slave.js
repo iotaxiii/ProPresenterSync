@@ -43,7 +43,6 @@ function onLocal(event) {
             sendInitState();
             getCurrentPlaylist();
             break;
-            break;
         case 'playlistRequestAll':
             if (!!callback) callback(JSON.stringify(message));
             break;

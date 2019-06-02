@@ -40,7 +40,14 @@ function connectPP() {
         }
     ); 
 
-    wsl.on('open', () => { pp.init(wsl, wsr, sendToClient); });
+    wsl.on('open', () => { initPP(wsl, wsr); });
+    wsr.on('open', () => { initPP(wsl, wsr); });
+}
+
+function initPP(wsl, wsr) {
+    if (wsl.readyState == WebSocket.OPEN && wsr.readyState == WebSocket.OPEN) {
+        pp.init(wsl, wsr, sendToClient);
+    }
 }
 
 function disconnect() {
